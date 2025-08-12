@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TraderX Assistant - Forex Mentorship Services</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --golden: #D4AF37;
+            --golden-dark: #B8860B;
+            --golden-light: #FFD700;
+            --lime-green: #32CD32;
+            --lime-green-dark: #228B22;
+            --lime-green-light: #90EE90;
+            --dark-bg: #121212;
+            --dark-card: #1E1E1E;
+            --text: #E0E0E0;
+            --text-light: #A0A0A0;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0a0a0a, #1a1a1a);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .chat-container {
+            width: 100%;
+            max-width: 450px;
+            background: var(--dark-bg);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7);
+            display: flex;
+            flex-direction: column;
+            height: 90vh;
+            border: 1px solid var(--golden);
+        }
+        
+        .chat-header {
+            background: linear-gradient(to right, var(--golden-dark), var(--golden));
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .chat-header h1 {
+            color: white;
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            letter-spacing: 1px;
+        }
+        
+        .chat-header p {
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 0.95rem;
+        }
+        
+        .status-indicator {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 12px;
+            height: 12px;
+            background: var(--lime-green);
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 0 0 2px var(--lime-green);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(50, 205, 50, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(50, 205, 50, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(50, 205, 50, 0); }
+        }
+        
+        .chat-box {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23121212"/><path d="M0 50 L100 50 M50 0 L50 100" stroke="%232a2a2a" stroke-width="0.5"/></svg>');
+            background-size: 30px 30px;
+        }
+        
+        .message {
+            max-width: 80%;
+            padding: 14px;
+            border-radius: 18px;
+            position: relative;
+            animation: fadeIn 0.3s ease;
+            line-height: 1.4;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .bot-message {
+            background: var(--dark-card);
+            border: 1px solid #2a2a2a;
+            border-bottom-color: var(--golden);
+            align-self: flex-start;
+            border-top-left-radius: 5px;
+        }
+        
+        .user-message {
+            background: linear-gradient(135deg, var(--lime-green-dark), var(--lime-green));
+            align-self: flex-end;
+            border-top-right-radius: 5px;
+            color: white;
+        }
+        
+        .service-card {
+            background: var(--dark-card);
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid #2a2a2a;
+            margin: 10px 0;
+            transition: all 0.3s ease;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            border-color: var(--golden);
+        }
+        
+        .service-header {
+            background: linear-gradient(to right, var(--golden-dark), var(--golden));
+            padding: 15px;
+            color: white;
+        }
+        
+        .service-title {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .service-price {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--lime-green-light);
+        }
+        
+        .service-price span {
+            font-size: 0.8rem;
+            font-weight: normal;
+            opacity: 0.8;
+        }
+        
+        .service-body {
+            padding: 15px;
+        }
+        
+        .service-features {
+            list-style-type: none;
+        }
+        
+        .service-features li {
+            padding: 8px 0;
+            border-bottom: 1px solid #2a2a2a;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .service-features li i {
+            color: var(--lime-green);
+        }
+        
+        .service-footer {
+            padding: 10px 15px;
+            background: #1a1a1a;
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        .payment-section {
+            background: var(--dark-card);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid #2a2a2a;
+            margin-top: 15px;
+        }
+        
+        .payment-method {
+            background: #1a1a1a;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 3px solid var(--golden);
+        }
+        
+        .payment-method h3 {
+            color: var(--golden);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .account-details {
+            background: #1a1a1a;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .instructions {
+            margin-top: 15px;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .instructions li:before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--lime-green);
+            font-weight: bold;
+        }
+        
+        .chat-input {
+            padding: 15px;
+            background: var(--dark-bg);
+            border-top: 1px solid #2a2a2a;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .suggestion-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        .suggestion-btn {
+            background: var(--dark-card);
+            border: 1px solid #2a2a2a;
+            color: var(--golden-light);
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        
+        .suggestion-btn:hover {
+            background: var(--golden);
+            color: #121212;
+            transform: translateY(-2px);
+        }
+        
+        .input-area {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .message-input {
+            flex: 1;
+            background: var(--dark-card);
+            border: 1px solid #2a2a2a;
+            border-radius: 30px;
+            padding: 12px 20px;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        
+        .message-input:focus {
+            border-color: var(--golden);
+            box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
+        }
+        
+        .send-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--lime-green-dark), var(--lime-green));
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+        }
+        
+        .send-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(50, 205, 50, 0.4);
+        }
+        
+        .service-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .service-btn {
+            background: var(--dark-card);
+            border: 1px solid #2a2a2a;
+            color: var(--golden-light);
+            padding: 12px 5px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .service-btn:hover {
+            background: var(--golden);
+            color: #121212;
+            border-color: var(--golden);
+        }
+        
+        .service-btn i {
+            font-size: 1.2rem;
+        }
+        
+        .enroll-btn {
+            background: linear-gradient(135deg, var(--lime-green-dark), var(--lime-green));
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 10px;
+            font-size: 1.1rem;
+        }
+        
+        .enroll-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(50, 205, 50, 0.4);
+        }
+        
+        .whatsapp-btn {
+            background: #25D366;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 1.1rem;
+        }
+        
+        .whatsapp-btn:hover {
+            background: #128C7E;
+            transform: translateY(-2px);
+        }
+        
+        .typing-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 15px;
+            background: var(--dark-card);
+            border-radius: 18px;
+            border-top-left-radius: 5px;
+            align-self: flex-start;
+        }
+        
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--golden);
+            border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+        
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-5px); }
+        }
+        
+        .service-highlight {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(34, 139, 34, 0.15));
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 15px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .highlight-title {
+            color: var(--golden);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        
+        .best-value-badge {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #121212;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            margin-left: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 480px) {
+            .chat-container {
+                height: 95vh;
+                border-radius: 15px;
+            }
+            
+            .service-buttons {
+                grid-template-columns: 1fr;
+            }
+            
+            .message {
+                max-width: 85%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <div class="status-indicator"></div>
+            <h1>TraderX Assistant</h1>
+            <p>Forex Mentorship Services at your fingertips</p>
+        </div>
+        
+        <div class="chat-box" id="chatBox">
+            <!-- Chat messages will be inserted here by JavaScript -->
+        </div>
+        
+        <div class="chat-input">
+            <div class="suggestion-buttons" id="suggestionButtons">
+                <button class="suggestion-btn">Take me to VIP</button>
+                <button class="suggestion-btn">Show services</button>
+                <button class="suggestion-btn">How to enroll</button>
+                <button class="suggestion-btn">Payment methods</button>
+            </div>
+            
+            <div class="input-area">
+                <input type="text" class="message-input" id="messageInput" placeholder="Ask me anything..." autocomplete="off">
+                <button class="send-btn" id="sendBtn">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatBox = document.getElementById('chatBox');
+            const messageInput = document.getElementById('messageInput');
+            const sendBtn = document.getElementById('sendBtn');
+            const suggestionButtons = document.getElementById('suggestionButtons');
+            
+            // Services data based on your website
+            const services = [
+                {
+                    id: 'full-mentorship',
+                    name: 'Full Mentorship Course',
+                    price: '75',
+                    period: 'one-time',
+                    description: 'Learn SMC, Price Action, and Spike Strategy in a comprehensive course',
+                    features: [
+                        'Market structure basics',
+                        'Price Action Mastery',
+                        'Spike Strategy implementation',
+                        'Advanced SMC concepts'
+                    ]
+                },
+                {
+                    id: 'vip-weekly',
+                    name: 'VIP Weekly',
+                    price: '15',
+                    period: 'per week',
+                    description: 'Access our premium signals and strategies for a week.',
+                    features: [
+                        'Access to all signals',
+                        'Mentorship for one week',
+                        'Entry, Stop-Loss, and Take-Profit',
+                        '24/7 support'
+                    ]
+                },
+                {
+                    id: 'vip-2weeks',
+                    name: 'VIP 2 Weeks',
+                    price: '30',
+                    period: 'per 2 weeks',
+                    description: 'An extended VIP package for two weeks of access and support.',
+                    features: [
+                        'All VIP Weekly features',
+                        'Advanced trading analysis',
+                        'Access to spike strategy',
+                        'Two weeks of mentorship'
+                    ],
+                    isPopular: true
+                },
+                {
+                    id: 'vip-monthly',
+                    name: 'VIP Monthly',
+                    price: '40',
+                    period: 'per month',
+                    description: 'Our most comprehensive package with a full month of support.',
+                    features: [
+                        'All VIP 2 Weeks features',
+                        'Exclusive market insights',
+                        'Personalized trading plan',
+                        'Full month of mentorship'
+                    ]
+                },
+                {
+                    id: 'spike-strategy',
+                    name: 'Spike Strategy Only',
+                    price: '30',
+                    period: 'one-time',
+                    description: 'Learn the proven Spike Strategy to catch rapid market movements',
+                    features: [
+                        'Personalized mentorship',
+                        'Proprietary trading strategies',
+                        'Live trading sessions',
+                        'Advanced market analysis'
+                    ]
+                },
+                {
+                    id: 'smc-course',
+                    name: 'SMC Course',
+                    price: '25',
+                    period: 'one-time',
+                    description: 'Learn Smart Money Concepts for advanced trading',
+                    features: [
+                        'Order blocks & liquidity',
+                        'Market structure breaks',
+                        'Fair value gaps',
+                        'Entry & exit strategies'
+                    ]
+                },
+                {
+                    id: 'price-action',
+                    name: 'Price Action Course',
+                    price: '35',
+                    period: 'one-time',
+                    description: 'Master price action techniques for profitable trading',
+                    features: [
+                        'Price action mastery',
+                        'Advanced risk management',
+                        'Institutional order flow',
+                        'Comprehensive analysis'
+                    ]
+                }
+            ];
+            
+            // Initial welcome message
+            setTimeout(() => {
+                addBotMessage("Hello! I'm your TraderX Assistant. 👋<br>Welcome to the ultimate Forex mentorship platform!");
+                setTimeout(() => {
+                    addBotMessage("How can I help you today? 😊");
+                    showServiceSuggestions();
+                }, 1000);
+            }, 500);
+            
+            // Send message when button is clicked
+            sendBtn.addEventListener('click', sendMessage);
+            
+            // Send message when Enter key is pressed
+            messageInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+            
+            // Suggestion button functionality
+            document.querySelectorAll('.suggestion-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const text = this.textContent;
+                    messageInput.value = text;
+                    sendMessage();
+                });
+            });
+            
+            function sendMessage() {
+                const message = messageInput.value.trim();
+                if (message === '') return;
+                
+                // Add user message
+                addUserMessage(message);
+                messageInput.value = '';
+                
+                // Process the message
+                setTimeout(() => {
+                    processUserMessage(message);
+                }, 500);
+            }
+            
+            function addUserMessage(message) {
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('message', 'user-message');
+                messageDiv.innerHTML = message;
+                chatBox.appendChild(messageDiv);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+            
+            function addBotMessage(message, isTyping = false) {
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('message', 'bot-message');
+                
+                if (isTyping) {
+                    const typingDiv = document.createElement('div');
+                    typingDiv.classList.add('typing-indicator');
+                    
+                    for (let i = 0; i < 3; i++) {
+                        const dot = document.createElement('div');
+                        dot.classList.add('typing-dot');
+                        typingDiv.appendChild(dot);
+                    }
+                    
+                    messageDiv.appendChild(typingDiv);
+                    chatBox.appendChild(messageDiv);
+                } else {
+                    messageDiv.innerHTML = message;
+                    chatBox.appendChild(messageDiv);
+                }
+                
+                chatBox.scrollTop = chatBox.scrollHeight;
+                return messageDiv;
+            }
+            
+            function removeTypingIndicator() {
+                const typingIndicator = chatBox.querySelector('.typing-indicator');
+                if (typingIndicator) {
+                    typingIndicator.parentElement.remove();
+                }
+            }
+            
+            function showServiceSuggestions() {
+                const buttonsDiv = document.createElement('div');
+                buttonsDiv.classList.add('service-buttons');
+                
+                // Show 4 main services as suggestions
+                const mainServices = [services[2], services[3], services[4], services[0]];
+                
+                mainServices.forEach(service => {
+                    const button = document.createElement('button');
+                    button.classList.add('service-btn');
+                    button.innerHTML = `<i class="fas fa-crown"></i><span>${service.name}</span>`;
+                    button.addEventListener('click', function() {
+                        showServiceDetails(service);
+                    });
+                    buttonsDiv.appendChild(button);
+                });
+                
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('message', 'bot-message');
+                messageDiv.innerHTML = `<p>Here are our most popular services:</p>`;
+                messageDiv.appendChild(buttonsDiv);
+                chatBox.appendChild(messageDiv);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+            
+            function showServiceDetails(service) {
+                // Add user message indicating selection
+                const userMsg = document.createElement('div');
+                userMsg.classList.add('message', 'user-message');
+                userMsg.textContent = service.name;
+                chatBox.appendChild(userMsg);
+                
+                // Add typing indicator
+                const typingMsg = addBotMessage('', true);
+                
+                setTimeout(() => {
+                    removeTypingIndicator();
+                    
+                    let html = `
+                        <div class="service-card">
+                            <div class="service-header">
+                                <div class="service-title">
+                                    ${service.name}
+                                    ${service.isPopular ? '<span class="best-value-badge">BEST VALUE</span>' : ''}
+                                </div>
+                                <div class="service-price">$${service.price} <span>${service.period}</span></div>
+                                <p>${service.description}</p>
+                            </div>
+                            <div class="service-body">
+                                <ul class="service-features">
+                    `;
+                    
+                    service.features.forEach(feature => {
+                        html += `<li><i class="fas fa-check-circle"></i> ${feature}</li>`;
+                    });
+                    
+                    html += `
+                                </ul>
+                            </div>
+                            <div class="service-footer">
+                                <button class="enroll-btn" data-service="${service.id}">Enroll Now</button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    const messageDiv = document.createElement('div');
+                    messageDiv.classList.add('message', 'bot-message');
+                    messageDiv.innerHTML = html;
+                    chatBox.appendChild(messageDiv);
+                    
+                    // Add event listener to the enroll button
+                    const enrollBtn = messageDiv.querySelector('.enroll-btn');
+                    enrollBtn.addEventListener('click', function() {
+                        showPaymentDetails(service);
+                    });
+                    
+                    chatBox.scrollTop = chatBox.scrollHeight;
+                }, 1000);
+            }
+            
+            function showPaymentDetails(service) {
+                // Add user message
+                const userMsg = document.createElement('div');
+                userMsg.classList.add('message', 'user-message');
+                userMsg.textContent = "I'd like to enroll in " + service.name;
+                chatBox.appendChild(userMsg);
+                
+                // Add typing indicator
+                const typingMsg = addBotMessage('', true);
+                
+                setTimeout(() => {
+                    removeTypingIndicator();
+                    
+                    let html = `
+                        <p>I'm excited to have you join <strong>${service.name}</strong> for <strong>$${service.price}</strong>!</p>
+                        
+                        <div class="payment-section">
+                            <h3 style="color: var(--golden); margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
+                                <i class="fas fa-credit-card"></i> Payment Options
+                            </h3>
+                            
+                            <div class="payment-method">
+                                <h3><i class="fas fa-mobile-alt"></i> EcoCash</h3>
+                                <p>Mobile Money Payment</p>
+                                <p>Mobile Number: <strong>0778652739</strong></p>
+                            </div>
+                            
+                            <div class="account-details">
+                                <h3 style="color: var(--golden); margin-bottom: 10px;">Account Details</h3>
+                                <p><strong>Name:</strong> MICHAEL TANATSWA</p>
+                                <p><strong>Course:</strong> ${service.name}</p>
+                                <p><strong>Amount:</strong> $${service.price}</p>
+                            </div>
+                            
+                            <div class="instructions">
+                                <h3 style="color: var(--golden); margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-info-circle"></i> Payment Instructions
+                                </h3>
+                                <ul>
+                                    <li>Make payment using EcoCash</li>
+                                    <li>Use the exact amount: $${service.price}</li>
+                                    <li>Send payment confirmation screenshot to WhatsApp: +263778652739</li>
+                                    <li>Include your full name and selected course in the message</li>
+                                    <li>Access details will be sent within 24 hours of payment confirmation</li>
+                                </ul>
+                            </div>
+                            
+                            <button class="whatsapp-btn" id="whatsappBtn">
+                                <i class="fab fa-whatsapp"></i> Confirm via WhatsApp
+                            </button>
+                        </div>
+                        
+                        <div class="service-highlight">
+                            <div class="highlight-title">
+                                <i class="fas fa-star"></i> Pro Tip
+                            </div>
+                            <p>For the best value, consider our <strong>VIP 2 Weeks</strong> package which gives you more time to master the strategies!</p>
+                        </div>
+                    `;
+                    
+                    const messageDiv = document.createElement('div');
+                    messageDiv.classList.add('message', 'bot-message');
+                    messageDiv.innerHTML = html;
+                    chatBox.appendChild(messageDiv);
+                    
+                    // WhatsApp button functionality
+                    const whatsappBtn = messageDiv.querySelector('#whatsappBtn');
+                    whatsappBtn.addEventListener('click', function() {
+                        const message = `Hello TraderX, I want to enroll in the ${service.name} course priced at $${service.price}. My name is [Your Full Name].`;
+                        const whatsappUrl = `https://wa.me/263778652739?text=${encodeURIComponent(message)}`;
+                        window.open(whatsappUrl, '_blank');
+                    });
+                    
+                    chatBox.scrollTop = chatBox.scrollHeight;
+                }, 1200);
+            }
+            
+            function processUserMessage(message) {
+                const lowerMsg = message.toLowerCase();
+                
+                // Clear previous suggestions
+                while (suggestionButtons.firstChild) {
+                    suggestionButtons.removeChild(suggestionButtons.firstChild);
+                }
+                
+                // Add typing indicator
+                const typingMsg = addBotMessage('', true);
+                
+                // Process message after a delay
+                setTimeout(() => {
+                    removeTypingIndicator();
+                    
+                    // Greetings
+                    if (lowerMsg.includes('hello') || lowerMsg.includes('hi') || lowerMsg.includes('hey') || 
+                        lowerMsg.includes('good morning') || lowerMsg.includes('good afternoon') || 
+                        lowerMsg.includes('good evening')) {
+                        addBotMessage("Hello! Welcome to TraderX Forex Mentorship. How can I assist you today?");
+                        showServiceSuggestions();
+                        return;
+                    }
+                    
+                    // How are you
+                    if (lowerMsg.includes('how are you')) {
+                        addBotMessage("I'm doing great, thank you! Ready to help you master Forex trading. 😊<br>What would you like to know about our services?");
+                        addSuggestionButtons(['Show me services', 'Tell me about VIP', 'How to enroll']);
+                        return;
+                    }
+                    
+                    // Services inquiry
+                    if (lowerMsg.includes('service') || lowerMsg.includes('offer') || 
+                        lowerMsg.includes('what do you have') || lowerMsg.includes('courses') || 
+                        lowerMsg.includes('program')) {
+                        addBotMessage("We offer several Forex mentorship programs designed for all skill levels:");
+                        showServiceSuggestions();
+                        return;
+                    }
+                    
+                    // VIP inquiry
+                    if (lowerMsg.includes('vip') || lowerMsg.includes('premium')) {
+                        addBotMessage("Our VIP programs offer premium access to signals, strategies, and personalized mentorship:");
+                        showServiceDetails(services[2]); // VIP 2 Weeks
+                        return;
+                    }
+                    
+                    // Enroll inquiry
+                    if (lowerMsg.includes('enroll') || lowerMsg.includes('register') || 
+                        lowerMsg.includes('sign up') || lowerMsg.includes('join')) {
+                        addBotMessage("Great! Let me show you our most popular enrollment options:");
+                        showServiceSuggestions();
+                        return;
+                    }
+                    
+                    // Payment inquiry
+                    if (lowerMsg.includes('pay') || lowerMsg.includes('payment') || 
+                        lowerMsg.includes('money') || lowerMsg.includes('ecocash')) {
+                        addBotMessage("We accept payments via EcoCash. Let me show you the details for our most popular course:");
+                        showPaymentDetails(services[3]); // VIP Monthly
+                        return;
+                        
+                    }
+                    
+                    // Specific course requests
+                    if (lowerMsg.includes('full') && lowerMsg.includes('mentorship')) {
+                        showServiceDetails(services[0]);
+                        return;
+                    }
+                    
+                    if (lowerMsg.includes('weekly') && lowerMsg.includes('vip')) {
+                        showServiceDetails(services[1]);
+                        return;
+                    }
+                    
+                    if (lowerMsg.includes('2 weeks') || lowerMsg.includes('two weeks')) {
+                        showServiceDetails(services[2]);
+                        return;
+                    }
+                    
+                    if (lowerMsg.includes('monthly') && lowerMsg.includes('vip')) {
+                        showServiceDetails(services[3]);
+                        return;
+                    }
+                    
+                    if (lowerMsg.includes('spike') && lowerMsg.includes('strategy')) {
+                        showServiceDetails(services[4]);
+                        return;
+                    }
+                    
+                    if (lowerMsg.includes('smc')) {
+                        showServiceDetails(services[5]);
+                        return;
+                    }
+                    
+                    if (lowerMsg.includes('price') && lowerMsg.includes('action')) {
+                        showServiceDetails(services[6]);
+                        return;
+                    }
+                    
+                    // Default response
+                    addBotMessage("I understand you're interested in our Forex mentorship services!<br><br>Would you like to:<br>- See our available courses?<br>- Learn about VIP programs?<br>- Get payment information?");
+                    addSuggestionButtons(['Show me services', 'Tell me about VIP', 'Payment details']);
+                }, 1000);
+            }
+            
+            function addSuggestionButtons(buttonTexts) {
+                // Clear previous suggestions
+                while (suggestionButtons.firstChild) {
+                    suggestionButtons.removeChild(suggestionButtons.firstChild);
+                }
+                
+                // Add new suggestion buttons
+                buttonTexts.forEach(text => {
+                    const button = document.createElement('button');
+                    button.classList.add('suggestion-btn');
+                    button.textContent = text;
+                    button.addEventListener('click', function() {
+                        messageInput.value = text;
+                        sendMessage();
+                    });
+                    suggestionButtons.appendChild(button);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
